@@ -1,13 +1,6 @@
-/*
-GAME RULES:
+import Gamer from './gamer';
+import {initPlayer} from './player';
 
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
-
-*/
 
 const RESET_VALUE = 2;
 
@@ -21,61 +14,8 @@ const limit = document.querySelector('.limit__content');
 
 limit.value = LIMIT;
 
-
-function Gamer(name, score, winCount) {
-    this.name = name;
-    this.score = score;
-    this.winCount = winCount;
-}
-
-Gamer.prototype.getScore = function () {
-    return this.score
-}
-Gamer.prototype.setScore = function (score) {
-    this.score = score
-}
-Gamer.prototype.resetScore = function () {
-    this.score = 0
-}
-
-
-const getWinnerStore = () => {
-
-    if (localStorage.getItem('winner')) {
-        return JSON.parse(localStorage.getItem('winner'));
-    } else {
-        return [];
-    }
-}
-
-
 let players = [];
 
-
-const initPlayer = (arr) => {
-
-    return arr.reduce((array, e, i) => {
-        let result = prompt(e + 'you name', '')
-        if (array && array.some(item => item.name === result)) {
-            return [...array, new Gamer(`Player ` + ++playerNumber, 0, 0)]
-        }
-        if (result && validatePlayer(result)) {
-            return [...array, new Gamer(result, 0, 0)]
-        } else if (!result) {
-            return [...array, new Gamer(`Player ` + ++playerNumber, 0, 0)]
-        } else {
-            if (confirm('Это точно ВЫ?')) {
-                return [...array, new Gamer(result, 0, 0)]
-            }
-        }
-
-
-    }, [])
-}
-
-const validatePlayer = (str) => {
-    return !(getWinnerStore().length && getWinnerStore().some(e => e.name === str));
-}
 
 const initGame = () => {
     document.querySelector('#current-0').textContent = 0;
@@ -83,7 +23,7 @@ const initGame = () => {
     document.querySelector('#score-0').textContent = 0;
     document.querySelector('#score-1').textContent = 0;
     diceElement.forEach(e => e.style.display = 'none');
-    players = initPlayer(['player1', 'player2']);
+    players = initPlayer(['player1', 'player2'], playerNumber);
     players.forEach((e, i) => {
         document.querySelector(`#name-${i}`).textContent = e.name
         e.resetScore();
@@ -169,9 +109,9 @@ const changePlayer = () => {
 }
 
 document.querySelector('.btn-hold').addEventListener('click', function () {
+
     players[activePlayer].setScore(players[activePlayer].score += current);
-    document.querySelector(`#score-${activePlayer}`).textContent = players[activePlayer].score;
-    changePlayer();
+    document.querySelector(`#score-${activePlayer}`).textContent = players[activePlayer].score;changePlayer(activePlayer);
 });
 
 
